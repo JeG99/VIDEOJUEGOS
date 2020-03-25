@@ -6,7 +6,7 @@ import java.awt.Graphics;
  *
  * @author Andrés ALam Sánchez Torres
  */
-public class Player extends Item{
+public class Player extends Item {
 
     private int direction;
     private int width;
@@ -15,13 +15,27 @@ public class Player extends Item{
     private int score;
     private int hitCounter;
     private Game game;
-    
+
+    // for player to animate
+    private Animation animationUp;
+    private Animation animationDown;
+    private Animation animationLeft;
+    private Animation animationRight;
+    private Animation currentAnimation;
+
     public Player(int x, int y, int direction, int width, int height, Game game) {
         super(x, y, width, height);
         this.direction = direction;
         this.game = game;
         life = (int) (Math.random() * 3) + 3;
         hitCounter = 0;
+
+        // loading animations up
+        this.animationUp = new Animation(Assets.playerUp, 100);
+        this.animationDown = new Animation(Assets.playerDown, 100);
+        this.animationLeft = new Animation(Assets.playerLeft, 100);
+        this.animationRight = new Animation(Assets.playerRight, 100);
+        this.currentAnimation = animationRight;
     }
 
     public int getDirection() {
@@ -63,42 +77,40 @@ public class Player extends Item{
     public void tick() {
         // moving player depending on flags
         if (game.getKeyManager().up) {
-           setY(getY() - 1);
-           setX(getX() - 1);
-        //    game.beep();
-        }
-        else if (game.getKeyManager().down) {
+            currentAnimation = animationUp;
             setY(getY() - 1);
-            setX(getX() + 1);
-        //    game.beep();
         }
-        else if (game.getKeyManager().left) {
+        if (game.getKeyManager().down) {
+            currentAnimation = animationDown;
             setY(getY() + 1);
+        }
+        if (game.getKeyManager().left) {
+            currentAnimation = animationLeft;
             setX(getX() - 1);
-        //    game.beep();
         }
-        else if (game.getKeyManager().right) {
-            setY(getY() + 1);
+        if (game.getKeyManager().right) {
+            currentAnimation = animationRight;
             setX(getX() + 1);
-        //    game.beep();
         }
+
         // reset x position and y position if colision
         if (getX() + getWidth() >= game.getWidth()) {
             setX(game.getWidth() - getWidth());
-        }
-        else if (getX() <= 0) {
+        } else if (getX() <= 0) {
             setX(0);
         }
         if (getY() + getHeight() >= game.getHeight()) {
             setY(game.getHeight() - getHeight());
-        }
-        else if (getY() <= 0) {
+        } else if (getY() <= 0) {
             setY(0);
         }
+
+        currentAnimation.tick();
     }
 
     @Override
     public void render(Graphics g) {
-        g.drawImage(Assets.player, getX(), getY(), getWidth(), getHeight(), null);
+        g.drawImage(currentAnimation.getCurrentFrame(), getX(), getY(), getWidth(), getHeight(), null);
+        //g.drawImage(Assets.player, getX(), getY(), getWidth(), getHeight(), null);
     }
 }
