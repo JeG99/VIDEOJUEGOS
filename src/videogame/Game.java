@@ -31,6 +31,7 @@ public class Game implements Runnable {
     private Player player;          // to use a player
     private KeyManager keyManager;  // to manage the keyboard
     private boolean gameOver;
+    private boolean paused;
 
     private LinkedList<Enemy> enemies;
     private LinkedList<Ally> allies;
@@ -47,6 +48,7 @@ public class Game implements Runnable {
         this.width = width;
         this.height = height;
         gameOver = false;
+        paused = false;
         running = false;
         keyManager = new KeyManager();
         enemies = new LinkedList<Enemy>();
@@ -83,7 +85,7 @@ public class Game implements Runnable {
         }
 
         int allyCount = (int) (Math.random() * 6) + 10;
-        for (int i = 0; i < enemyCount; i++) {
+        for (int i = 0; i < allyCount; i++) {
             allies.add(new Ally(64, 64, this));
         }
         
@@ -135,26 +137,31 @@ public class Game implements Runnable {
     
     private void tick() {
         keyManager.tick();
-
-        // avancing player with colision
-        player.tick();
-
-        for (Enemy enemy : enemies) {
-            enemy.tick();
-            if (player.collision(enemy)) {
-                player.hit();
-                enemy.setX(getWidth() + (int) (Math.random() * getWidth()));
-                enemy.setY((int) (Math.random() * getHeight()));
-                beep(Assets.hit);
-            }
+        if (keyManager.pause) {
+            paused = !paused;
         }
-        for (Ally ally : allies) {
-            ally.tick();
-            if (player.collision(ally)) {
-                player.setScore(player.getScore() + 5);
-                ally.setX(-(getWidth() + (int) (Math.random() * getWidth())));
-                ally.setY((int) (Math.random() * getHeight()));
-                beep(Assets.score);
+
+        if (!paused) {
+            // avancing player with colision
+            player.tick();
+
+            for (Enemy enemy : enemies) {
+                enemy.tick();
+                if (player.collision(enemy)) {
+                    player.hit();
+                    enemy.setX(getWidth() + (int) (Math.random() * getWidth()));
+                    enemy.setY((int) (Math.random() * getHeight()));
+                    beep(Assets.hit);
+                }
+            }
+            for (Ally ally : allies) {
+                ally.tick();
+                if (player.collision(ally)) {
+                    player.setScore(player.getScore() + 5);
+                    ally.setX(-(getWidth() + (int) (Math.random() * getWidth())));
+                    ally.setY((int) (Math.random() * getHeight()));
+                    beep(Assets.score);
+                }
             }
         }
     }
