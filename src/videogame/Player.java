@@ -1,94 +1,99 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package videogame;
 
 import java.awt.Graphics;
 
 /**
  *
- * @author antoniomejorado
+ * @author Andrés ALam Sánchez Torres
  */
-public class Player extends Item {
+public class Player extends Item{
 
     private int direction;
-    private Game game;
-    private int lifes;
+    private int width;
+    private int height;
+    private int life;
     private int score;
-    private int lifeCounter;
-
-    public Player(int x, int y, int direction, int width, int height, Game game, int lifes, int score, int lifeCounter) {
+    private int hitCounter;
+    private Game game;
+    
+    public Player(int x, int y, int direction, int width, int height, Game game) {
         super(x, y, width, height);
         this.direction = direction;
         this.game = game;
-        this.lifes = lifes;
-        this.score = score;
-        this.lifeCounter = lifeCounter;
-    }
-
-    public int getLifes() {
-        return lifes;
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    public int getLifeCounter() {
-        return lifeCounter;
-    }
-
-    public void setLifes(int lifes) {
-        this.lifes = lifes;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
-    }
-
-    public void setLifeCounter(int lifeCounter) {
-        this.lifeCounter = lifeCounter;
+        life = (int) (Math.random() * 3) + 3;
+        hitCounter = 0;
     }
 
     public int getDirection() {
         return direction;
     }
 
+    public int getLife() {
+        return life;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
     public void setDirection(int direction) {
         this.direction = direction;
+    }
+
+    public void setLife(int life) {
+        this.life = life;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public void hit() {
+        hitCounter++;
+        if (hitCounter > 5) {
+            hitCounter = 0;
+            setLife(getLife() - 1);
+            if (getLife() <= 0) {
+                game.gameOver();
+            }
+        }
     }
 
     @Override
     public void tick() {
         // moving player depending on flags
-        if (game.getKeyManager().q) {
-            setY(getY() - 1);
-            setX(getX() - 1);
+        if (game.getKeyManager().qPressed) {
+           setY(getY() - 1);
+           setX(getX() - 1);
+        //    game.beep();
         }
-        if (game.getKeyManager().p) {
+        else if (game.getKeyManager().pPressed) {
             setY(getY() - 1);
             setX(getX() + 1);
+        //    game.beep();
         }
-        if (game.getKeyManager().a) {
+        else if (game.getKeyManager().aPressed) {
             setY(getY() + 1);
             setX(getX() - 1);
+        //    game.beep();
         }
-        if (game.getKeyManager().l) {
+        else if (game.getKeyManager().lPressed) {
             setY(getY() + 1);
             setX(getX() + 1);
+        //    game.beep();
         }
         // reset x position and y position if colision
-        if (getX() + 60 >= game.getWidth()) {
-            setX(game.getWidth() - 60);
-        } else if (getX() <= -30) {
-            setX(-30);
+        if (getX() + getWidth() >= game.getWidth()) {
+            setX(game.getWidth() - getWidth());
         }
-        if (getY() + 80 >= game.getHeight()) {
-            setY(game.getHeight() - 80);
-        } else if (getY() <= -20) {
-            setY(-20);
+        else if (getX() <= 0) {
+            setX(0);
+        }
+        if (getY() + getHeight() >= game.getHeight()) {
+            setY(game.getHeight() - getHeight());
+        }
+        else if (getY() <= 0) {
+            setY(0);
         }
     }
 

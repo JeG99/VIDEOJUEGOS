@@ -6,16 +6,20 @@
 package videogame;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.util.LinkedList;
 
 /**
- *
- * @author Elías Garza
+ * Game
+ * 
+ * Clase que representa el juego
+ * 
+ * @author Andrés Alam Sánchez Torres
+
  */
 public class Game implements Runnable {
-
     private BufferStrategy bs;      // to have several buffers when displaying
     private Graphics g;             // to paint objects
     private Display display;        // to display in the game
@@ -26,28 +30,31 @@ public class Game implements Runnable {
     private boolean running;        // to set the game
     private Player player;          // to use a player
     private KeyManager keyManager;  // to manage the keyboard
-    private LinkedList<Enemy> enemies;  // to store the enemies
-    private LinkedList<Friend> friends;  // to store the friends
-    private SoundClip soundClip;
+    private boolean gameOver;
 
+    private LinkedList<Enemy> enemies;
+    private LinkedList<Ally> allies;
+    
+    
     /**
      * to create title, width and height and set the game is still not running
-     *
      * @param title to set the title of the window
      * @param width to set the width of the window
-     * @param height to set the height of the window
+     * @param height  to set the height of the window
      */
     public Game(String title, int width, int height) {
         this.title = title;
         this.width = width;
         this.height = height;
+        gameOver = false;
         running = false;
         keyManager = new KeyManager();
+        enemies = new LinkedList<Enemy>();
+        allies = new LinkedList<Ally>();
     }
 
     /**
      * To get the width of the game window
-     *
      * @return an <code>int</code> value with the width
      */
     public int getWidth() {
@@ -56,40 +63,35 @@ public class Game implements Runnable {
 
     /**
      * To get the height of the game window
-     *
      * @return an <code>int</code> value with the height
      */
     public int getHeight() {
         return height;
     }
-
+    
     /**
      * initializing the display window of the game
      */
     private void init() {
-        display = new Display(title, getWidth(), getHeight());
+        display = new Display(title, getWidth(), getHeight());  
         Assets.init();
-        enemies = new LinkedList<Enemy>();
-        int rand = (int) (Math.random() * (10 - 8)) + 8;
-        for (int i = 1; i <= rand; i++) {
-            Enemy enemy = new Enemy(getWidth() + 200, ((int) (Math.random() * ((getHeight() - 100) - 0)) + 0), 1, 100, 100, this);
-            enemies.add(enemy);
-        }
-        friends = new LinkedList<Friend>();
-        rand = (int) (Math.random() * (15 - 10)) + 10;
-        for (int i = 1; i <= rand; i++) {
-            Friend friend = new Friend(-200, ((int) (Math.random() * ((getHeight() - 100) - 0)) + 0), 1, 100, 100, this);
-            friends.add(friend);
-        }
-        player = new Player(getWidth() / 2 - 50, getHeight() / 2 - 50, 1, 100, 100, this, ((int) (Math.random() * (5 - 3)) + 3), 0, 5);
-        display.getJframe().addKeyListener(keyManager);
-        //Assets.backSound.setLooping(true);
-        //Assets.backSound.play();
-    }
+        player = new Player(getWidth() / 2, getHeight() / 2, 1, 64, 64, this);
 
-    /**
-     * To run an instance of the game
-     */
+        int enemyCount = (int) (Math.random() * 3) + 8;
+        for (int i = 0; i < enemyCount; i++) {
+            enemies.add(new Enemy(64, 64, this));
+        }
+
+        int allyCount = (int) (Math.random() * 6) + 10;
+        for (int i = 0; i < enemyCount; i++) {
+            allies.add(new Ally(64, 64, this));
+        }
+        
+        display.getJframe().addKeyListener(keyManager);
+        //  Assets.backSound.setLooping(true);
+        //  Assets.backSound.play();
+    }
+    
     @Override
     public void run() {
         init();
@@ -110,122 +112,103 @@ public class Game implements Runnable {
             delta += (now - lastTime) / timeTick;
             // updating the last time
             lastTime = now;
-
+            
             // if delta is positive we tick the game
             if (delta >= 1) {
-                tick();
+                if (!gameOver) {
+                    tick();
+                }
                 render();
-                delta--;
+                delta --;
             }
         }
         stop();
     }
 
-    /**
-     * Returns keyManager
-     *
-     * @return keyManager
-     */
     public KeyManager getKeyManager() {
         return keyManager;
     }
-
-    /**
-     * Death sound
-     */
-    public void beep() {
-        Assets.gunShot.play();
+    
+    public void beep(SoundClip sound) {
+        sound.play();
     }
-
-    /**
-     * Friend sound
-     */
-    public void boop() {
-        Assets.score.play();
-    }
-
-    /**
-     * actualize everyone's positions
-     */
+    
     private void tick() {
         keyManager.tick();
+
+        // avancing player with colision
+        player.tick();
+
         for (Enemy enemy : enemies) {
             enemy.tick();
             if (player.collision(enemy)) {
-                enemy.setX(getWidth() + ((int) (Math.random() * (500 - 200)) + 200));
-                enemy.setY(((int) (Math.random() * ((getHeight() - 100) - 0)) + 0));
-                player.setLifeCounter(player.getLifeCounter() - 1);
-                if (player.getLifeCounter() <= 0) {
-                    player.setLifes(player.getLifes() - 1);
-                    player.setLifeCounter(5);
-                    if (player.getLifes() <= 0) {
-                        beep();
-                        //Assets.backSound.stop();
-                        renderFinalScreen(g);
-                        stop();
-                    }
-                }
+                player.hit();
+                enemy.setX(getWidth() + (int) (Math.random() * getWidth()));
+                enemy.setY((int) (Math.random() * getHeight()));
+                beep(Assets.hit);
             }
         }
-        for (Friend friend : friends) {
-            friend.tick();
-            if (player.collision(friend)) {
-                boop();
-                friend.setX(-((int) (Math.random() * (60 - 30)) + 30));
-                friend.setY(((int) (Math.random() * ((getHeight() - 100) - 0)) + 0));
+        for (Ally ally : allies) {
+            ally.tick();
+            if (player.collision(ally)) {
                 player.setScore(player.getScore() + 5);
+                ally.setX(-(getWidth() + (int) (Math.random() * getWidth())));
+                ally.setY((int) (Math.random() * getHeight()));
+                beep(Assets.score);
             }
         }
-        // avancing player with colision
-        player.tick();
     }
-
-    private void renderFinalScreen(Graphics g) {
-        g.drawImage(Assets.finalScreen, 0, 0, width, height, null);
-    }
-
-    public void write(Graphics g) {
-
-        int fontSize = 80;
-        //g.setFont(new Font("TimesRoman", Font.PLAIN, fontSize));
-        g.setColor(Color.red);
-        g.drawString("Score: " + Integer.toString(player.getScore()), 10, 20);
-        g.drawString("Lifes: " + Integer.toString(player.getLifes()), 200, 20);
-    }
-
+    
     private void render() {
         // get the buffer strategy from the display
         bs = display.getCanvas().getBufferStrategy();
         /* if it is null, we define one with 3 buffers to display images of
         the game, if not null, then we display every image of the game but
-        after clearing the Rectanlge, getting the graphic object from the
-        buffer strategy element.
+        after clearing the Rectanlge, getting the graphic object from the 
+        buffer strategy element. 
         show the graphic and dispose it to the trash system
-         */
+        */
         if (bs == null) {
             display.getCanvas().createBufferStrategy(3);
-        } else {
-
+        }
+        else if (!gameOver) {
             g = bs.getDrawGraphics();
             g.drawImage(Assets.background, 0, 0, width, height, null);
+            player.render(g);
 
             for (Enemy enemy : enemies) {
                 enemy.render(g);
             }
-            for (Friend friend : friends) {
-                friend.render(g);
-            }
-            player.render(g);
 
-            write(g);
+            for (Ally ally : allies) {
+                ally.render(g);
+            }
+
+            g.setFont(new Font(Font.DIALOG, Font.BOLD, 30));
+            g.setColor(Color.WHITE);
+            
+            g.drawString("LIFE: " + String.valueOf(player.getLife()), 50, 50);
+            g.drawString("SCORE: " + String.valueOf(player.getScore()), 50, 100);
+
+            bs.show();
+            g.dispose();
+        } else {
+            g = bs.getDrawGraphics();
+            g.drawImage(Assets.gameOverMsg, 0, 0, width, height, null);
+            
             bs.show();
             g.dispose();
         }
-
+       
     }
 
+    public void gameOver() {
+        beep(Assets.gameOverSound);
+        gameOver = true;
+    }
+    
     /**
-     * setting the thread for the game
+     * setting the thead for the game
      */
     public synchronized void start() {
         if (!running) {
@@ -234,21 +217,23 @@ public class Game implements Runnable {
             thread.start();
         }
     }
-
+    
     /**
      * stopping the thread
      */
     public synchronized void stop() {
         if (running) {
-
             running = false;
-
             try {
                 thread.join();
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
-            }
+            }           
         }
     }
+
+ 
+    
+
 
 }

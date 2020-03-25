@@ -1,81 +1,89 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package videogame;
 
 import java.awt.Canvas;
 import java.awt.Dimension;
 import javax.swing.JFrame;
 
+
 /**
- *
- * @author antoniomejorado
+ * Display
+ * 
+ * Clase para crear una ventana gráfica
+ * 
+ * @author Alam Sánchez
  */
 public class Display {
-    private JFrame jframe;  // this is the app class
-    private Canvas canvas;  // to display images
-    
-    private String title;   // title of the window
-    private int width;      // width of the window
-    private int height;     // height of the window
+    private JFrame jframe;  
+    private Canvas canvas;
+    private String title;
+    private int width;
+    private int height;
     
     /**
-     * initializes the values for the application game
-     * @param title to display the title of the window
-     * @param width to set the width
-     * @param height to set the height
+     * Display
+     * 
+     * Constructor del objeto Display
+     * @param title es el título de la ventana
+     * @param width es el ancho de la ventana
+     * @param height es el alto de la ventana
      */
     public Display(String title, int width, int height) {
         this.title = title;
         this.width = width;
-        this.height = height;        
+        this.height = height;
         createDisplay();
     }
     
     /**
-     * create the app and the canvas and add the canvas to the window app
-     */
-    public void createDisplay() {
-        // create the app window
-        jframe = new JFrame(title);
-        
-        // set the size of the window
-        jframe.setSize(width, height);
-        
-        // setting not resizable, visible and possible to close
-        jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        jframe.setResizable(false);
-        jframe.setLocationRelativeTo(null);
-        jframe.setVisible(true);
-        
-        // creating the canvas to paint and setting size
-        canvas = new Canvas();
-        canvas.setPreferredSize(new Dimension(width, height));
-        canvas.setMaximumSize(new Dimension(width, height));
-        canvas.setPreferredSize(new Dimension(width, height));
-        canvas.setFocusable(false);
-        
-        // adding the canvas to the app window and packing to
-        // get the right dimensions
-        jframe.add(canvas);
-        jframe.pack();
-    }
-
-    /**
-     * to get the jframe of the game
-     * @return jframe
+     * getJframe
+     * 
+     * Método para obtener el objeto jframe
+     * 
+     * @return  jframe
      */
     public JFrame getJframe() {
         return jframe;
     }
     
     /**
-     * to get the canvas of the game
-     * @return the canvas
+     * createDisplay
+     * 
+     * Método para generar la ventana
+     */
+    private void createDisplay() {
+        // crea ventana de aplicación
+        jframe = new JFrame(title);
+        
+        // asigna el tamaño de la ventana
+        jframe.setSize(width, height);
+        
+        jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        jframe.setResizable(false);
+        jframe.setLocationRelativeTo(null);
+        jframe.setVisible(true);
+        
+        // crea el canvas para pintar y sus configuraciones
+        canvas = new Canvas();
+        canvas.setPreferredSize(new Dimension(width, height));
+        canvas.setMaximumSize(new Dimension(width, height));
+        canvas.setFocusable(false);
+        
+        // agrega el canvas a la ventana y lo 'enpaqueta'
+        // para obtener las dimensiones adecuadas
+        jframe.add(canvas);
+        jframe.pack();
+    }
+    
+    /**
+     * getCanvas
+     * 
+     * Método para obtener el canvas de la ventana
+     * 
+     * @return canvas
      */
     public Canvas getCanvas() {
         return canvas;
     }
+    
+    
 }

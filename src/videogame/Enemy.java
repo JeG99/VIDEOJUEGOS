@@ -1,66 +1,52 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package videogame;
 
 import java.awt.Graphics;
 
 /**
- *
- * @author antoniomejorado
+ * Enemy
+ * 
+ * Clase que representa a un enemigo en el juego
+ * @author Andrés Alam Sánchez Torres
  */
-public class Enemy extends Item {
-
-    private int direction;
+public class Enemy extends Item{
     private Game game;
-
+    
     /**
-     * Enemy constructor
-     *
-     * @param x
-     * @param y
-     * @param direction
-     * @param width
-     * @param height
-     * @param game
+     * Enemy
+     * 
+     * Constructor de la clase
+     * 
+     * @param width es el ancho del enemigo
+     * @param height es el alto del enemigo
+     * @param game es la referencia al juego
      */
-    public Enemy(int x, int y, int direction, int width, int height, Game game) {
-        super(x, y, width, height);
-        this.direction = direction;
+    public Enemy(int width, int height, Game game) {
+        super(0, 0, width, height);
         this.game = game;
+        setNewPosition();
     }
 
     /**
-     * To update enemy's position
+     * setNewPosition
+     * 
+     * Da una posición inicial
      */
+    public void setNewPosition() {
+        setX(game.getWidth() + (int) (Math.random() * game.getWidth()));
+        setY((int) (Math.random() * game.getHeight()));
+    }
+
+
     @Override
     public void tick() {
-        // comming from the right side of the window
-        setX(getX() - ((int) (Math.random() * (5 - 3)) + 3));
-        // reset x position and y position if colision with borders
-        if (getX() <= -30) {
-            setX(game.getWidth() + ((int) (Math.random() * (500 - 200)) + 200));
-        }
+        int moveDistance = (int) (Math.random() * 3) + 3;
+        setX(getX() - moveDistance);
 
-        if (getY() + 80 >= game.getHeight()) {
-            setY(game.getHeight() - 80);
+        if (getX() < - getWidth()) {
+            setNewPosition();
         }
-
-        // enemies must come from above the upper border
-        /*
-        else if (getY() <= -20) {
-            setY(-20);
-        }
-         */
     }
 
-    /**
-     * To draw the enemy
-     *
-     * @param g
-     */
     @Override
     public void render(Graphics g) {
         g.drawImage(Assets.enemy, getX(), getY(), getWidth(), getHeight(), null);

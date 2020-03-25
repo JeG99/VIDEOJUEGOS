@@ -1,39 +1,39 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package videogame;
 
 import java.awt.image.BufferedImage;
 
 /**
- *
- * @author antoniomejorado
+ * Assets
+ * 
+ * Clase para administrar y cargar recursos de multimedia.
+ * 
+ * @author Alam Sánchez
  */
 public class Assets {
 
-    public static BufferedImage background; // to store background image
-    public static BufferedImage finalScreen;
-    public static BufferedImage player;     // to store the player image
-    public static BufferedImage enemy;
-    public static BufferedImage friend;
-    public static SoundClip backSound;
-    public static SoundClip gunShot;
-    public static SoundClip score;
+    public static BufferedImage background;     // imagen de fondo
+    public static BufferedImage gameOverMsg;    // imagen de game over
+    public static BufferedImage player;         // imagen del jugador
+    public static BufferedImage enemy;          // imagen del enemigo
+    public static BufferedImage ally;           // imagen del aliado
+    public static SoundClip hit;                // sonido de colisión con enemigo
+    public static SoundClip score;              // sonido de colisión con aliado
+    public static SoundClip gameOverSound;      // sonido de game over
 
     /**
-     * initializing the images of the game
+     * init
+     * 
+     * Método para cargar los recursos
      */
     public static void init() {
-        background = ImageLoader.loadImage("/images/background.jpg");
-        finalScreen = ImageLoader.loadImage("/images/finalscreen.jpg");
-        player = ImageLoader.loadImage("/images/mario.png");
+        background = ImageLoader.loadImage("/images/Background.jpg");
+        gameOverMsg = ImageLoader.loadImage("/images/game_over.jpg");
+        player = ImageLoader.loadImage("/images/player.png");
         enemy = ImageLoader.loadImage("/images/enemy.png");
-        friend = ImageLoader.loadImage("/images/friend.png");
-        backSound = new SoundClip("/sounds/back.wav");
-        gunShot = new SoundClip("/sounds/Gunshot.wav");
+        ally = ImageLoader.loadImage("/images/ally.png");
+        hit = new SoundClip("/sounds/hit.wav");
         score = new SoundClip("/sounds/score.wav");
+        gameOverSound = new SoundClip("/sounds/gameOver.wav");
     }
 
 }
