@@ -14,15 +14,24 @@ import java.awt.event.KeyListener;
  */
 public class KeyManager implements KeyListener {
     
-    public boolean qPressed;      // flag to move up the player
-    public boolean pPressed;    // flag to move down the player
-    public boolean aPressed;    // flag to move left the player
-    public boolean lPressed;   // flag to move right the player
+    public boolean up;      // flag to move up the player
+    public boolean down;    // flag to move down the player
+    public boolean left;    // flag to move left the player
+    public boolean right;   // flag to move right the player
+    public boolean pause;   // flag to pause game
 
-    private boolean keys[];  // to store all the flags for every key
+    private boolean pressedKeys[];  // to store all the flags for every key
+    private boolean releasedKeys[];  // to store all the flags for every released key
     
     public KeyManager() {
-        keys = new boolean[256];
+        pressedKeys = new boolean[256];
+        releasedKeys = new boolean[256];
+    }
+
+    public void clear() {
+        for (int i = 0; i < 256; i++) {
+            releasedKeys[i] = false;
+        }
     }
     
     @Override
@@ -32,22 +41,25 @@ public class KeyManager implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         // set true to every key pressed
-        keys[e.getKeyCode()] = true;
+        pressedKeys[e.getKeyCode()] = true;
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         // set false to every key released
-        keys[e.getKeyCode()] = false;
+        pressedKeys[e.getKeyCode()] = false;
+        releasedKeys[e.getKeyCode()] = true;
     }
     
     /**
      * to enable or disable moves on every tick
      */
     public void tick() {
-        qPressed = keys[KeyEvent.VK_Q];
-        pPressed = keys[KeyEvent.VK_P];
-        aPressed = keys[KeyEvent.VK_A];
-        lPressed = keys[KeyEvent.VK_L];
+        up = pressedKeys[KeyEvent.VK_UP];
+        down = pressedKeys[KeyEvent.VK_DOWN];
+        left = pressedKeys[KeyEvent.VK_LEFT];
+        right = pressedKeys[KeyEvent.VK_RIGHT];
+        pause = releasedKeys[KeyEvent.VK_P];
+        clear();
     }
 }

@@ -50,7 +50,7 @@ public class Player extends Item{
 
     public void hit() {
         hitCounter++;
-        if (hitCounter > 5) {
+        if (hitCounter >= 5) {
             hitCounter = 0;
             setLife(getLife() - 1);
             if (getLife() <= 0) {
@@ -62,22 +62,22 @@ public class Player extends Item{
     @Override
     public void tick() {
         // moving player depending on flags
-        if (game.getKeyManager().qPressed) {
+        if (game.getKeyManager().up) {
            setY(getY() - 1);
            setX(getX() - 1);
         //    game.beep();
         }
-        else if (game.getKeyManager().pPressed) {
+        else if (game.getKeyManager().down) {
             setY(getY() - 1);
             setX(getX() + 1);
         //    game.beep();
         }
-        else if (game.getKeyManager().aPressed) {
+        else if (game.getKeyManager().left) {
             setY(getY() + 1);
             setX(getX() - 1);
         //    game.beep();
         }
-        else if (game.getKeyManager().lPressed) {
+        else if (game.getKeyManager().right) {
             setY(getY() + 1);
             setX(getX() + 1);
         //    game.beep();
