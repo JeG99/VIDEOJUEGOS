@@ -13,13 +13,14 @@ import java.util.LinkedList;
 
 /**
  * Game
- * 
+ *
  * Clase que representa el juego
- * 
+ *
  * @author Andrés Alam Sánchez Torres
-
+ *
  */
 public class Game implements Runnable {
+
     private BufferStrategy bs;      // to have several buffers when displaying
     private Graphics g;             // to paint objects
     private Display display;        // to display in the game
@@ -32,16 +33,17 @@ public class Game implements Runnable {
     private KeyManager keyManager;  // to manage the keyboard
     private boolean gameOver;
     private boolean paused;
+    private ReadAndWrite dataSaveManager; // to manage data saves
 
     private LinkedList<Enemy> enemies;
     private LinkedList<Ally> allies;
-    
-    
+
     /**
      * to create title, width and height and set the game is still not running
+     *
      * @param title to set the title of the window
      * @param width to set the width of the window
-     * @param height  to set the height of the window
+     * @param height to set the height of the window
      */
     public Game(String title, int width, int height) {
         this.title = title;
@@ -55,8 +57,21 @@ public class Game implements Runnable {
         allies = new LinkedList<Ally>();
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
+    public LinkedList<Enemy> getEnemies() {
+        return enemies;
+    }
+
+    public LinkedList<Ally> getAllies() {
+        return allies;
+    }
+
     /**
      * To get the width of the game window
+     *
      * @return an <code>int</code> value with the width
      */
     public int getWidth() {
@@ -65,17 +80,18 @@ public class Game implements Runnable {
 
     /**
      * To get the height of the game window
+     *
      * @return an <code>int</code> value with the height
      */
     public int getHeight() {
         return height;
     }
-    
+
     /**
      * initializing the display window of the game
      */
     private void init() {
-        display = new Display(title, getWidth(), getHeight());  
+        display = new Display(title, getWidth(), getHeight());
         Assets.init();
         player = new Player(getWidth() / 2, getHeight() / 2, 1, 64, 64, this);
 
@@ -88,12 +104,12 @@ public class Game implements Runnable {
         for (int i = 0; i < allyCount; i++) {
             allies.add(new Ally(64, 64, this));
         }
-        
+
         display.getJframe().addKeyListener(keyManager);
         //  Assets.backSound.setLooping(true);
         //  Assets.backSound.play();
     }
-    
+
     @Override
     public void run() {
         init();
@@ -114,14 +130,14 @@ public class Game implements Runnable {
             delta += (now - lastTime) / timeTick;
             // updating the last time
             lastTime = now;
-            
+
             // if delta is positive we tick the game
             if (delta >= 1) {
                 if (!gameOver) {
                     tick();
                 }
                 render();
-                delta --;
+                delta--;
             }
         }
         stop();
@@ -130,17 +146,16 @@ public class Game implements Runnable {
     public KeyManager getKeyManager() {
         return keyManager;
     }
-    
+
     public void beep(SoundClip sound) {
         sound.play();
     }
-    
+
     private void tick() {
         keyManager.tick();
         if (keyManager.pause) {
             paused = !paused;
         }
-
         if (!paused) {
             // avancing player with colision
             player.tick();
@@ -163,22 +178,24 @@ public class Game implements Runnable {
                     beep(Assets.score);
                 }
             }
+            if (keyManager.save) {
+                dataSaveManager.Save(this, "src/savedata/SAVE.txt");
+            }
         }
     }
-    
+
     private void render() {
         // get the buffer strategy from the display
         bs = display.getCanvas().getBufferStrategy();
         /* if it is null, we define one with 3 buffers to display images of
         the game, if not null, then we display every image of the game but
-        after clearing the Rectanlge, getting the graphic object from the 
-        buffer strategy element. 
+        after clearing the Rectanlge, getting the graphic object from the
+        buffer strategy element.
         show the graphic and dispose it to the trash system
-        */
+         */
         if (bs == null) {
             display.getCanvas().createBufferStrategy(3);
-        }
-        else if (!gameOver) {
+        } else if (!gameOver) {
             g = bs.getDrawGraphics();
             g.drawImage(Assets.background, 0, 0, width, height, null);
             player.render(g);
@@ -193,7 +210,7 @@ public class Game implements Runnable {
 
             g.setFont(new Font(Font.DIALOG, Font.BOLD, 30));
             g.setColor(Color.WHITE);
-            
+
             g.drawString("LIFE: " + String.valueOf(player.getLife()), 50, 50);
             g.drawString("SCORE: " + String.valueOf(player.getScore()), 50, 100);
 
@@ -202,18 +219,18 @@ public class Game implements Runnable {
         } else {
             g = bs.getDrawGraphics();
             g.drawImage(Assets.gameOverMsg, 0, 0, width, height, null);
-            
+
             bs.show();
             g.dispose();
         }
-       
+
     }
 
     public void gameOver() {
         beep(Assets.gameOverSound);
         gameOver = true;
     }
-    
+
     /**
      * setting the thead for the game
      */
@@ -224,7 +241,7 @@ public class Game implements Runnable {
             thread.start();
         }
     }
-    
+
     /**
      * stopping the thread
      */
@@ -235,12 +252,8 @@ public class Game implements Runnable {
                 thread.join();
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
-            }           
+            }
         }
     }
-
- 
-    
-
 
 }
