@@ -46,6 +46,10 @@ public class Player extends Item {
         return life;
     }
 
+    public int getHitCounter() {
+        return hitCounter;
+    }
+
     public int getScore() {
         return score;
     }
@@ -56,6 +60,10 @@ public class Player extends Item {
 
     public void setLife(int life) {
         this.life = life;
+    }
+
+    public void setHitCounter(int hitCounter) {
+        this.hitCounter = hitCounter;
     }
 
     public void setScore(int score) {
