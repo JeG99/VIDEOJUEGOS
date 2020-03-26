@@ -79,7 +79,7 @@ public class Assets {
         }
 
         //loading enemy sprites
-        allySprites = ImageLoader.loadImage("/images/PlayerSS.png");
+        allySprites = ImageLoader.loadImage("/images/tnsdd-764eb.png");
         Spritesheet allySpritesheet = new Spritesheet(allySprites);
 
         allyRight = new BufferedImage[9];
